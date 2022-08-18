@@ -1,5 +1,11 @@
 import {DataType} from "../enums/data-type";
-import {DateFilterData, NumberFilterData, TextFilterData} from "../models/filter-data";
+import {
+    DateFilterData,
+    NumberFilterData,
+    ShamsiDateFilterData,
+    TextFilterData,
+    TimeFilterData
+} from "../models/filter-data";
 
 export const createSample = (dataType: DataType) : any => {
     switch (dataType) {
@@ -10,12 +16,16 @@ export const createSample = (dataType: DataType) : any => {
         case DataType.Date:
             return new DateFilterData()
         case DataType.Time:
-            return new DateFilterData()
+            return new TimeFilterData()
         case DataType.DateTime:
             return new DateFilterData()
         case DataType.Text:
             return new TextFilterData()
         case DataType.Raw:
             return new TextFilterData()
+        case DataType.ShamsiTime:
+            return new TimeFilterData()
+        case DataType.ShamsiDate:
+            return new ShamsiDateFilterData()
     }
 }

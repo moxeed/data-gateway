@@ -1,10 +1,8 @@
 import express, {Application, Request, Response} from 'express'
-import {getViewInfo, MssqlQueryService} from "./sqlserver/enigne/query-builder";
+import {MssqlQueryService} from "./sqlserver/enigne/query-builder";
 import {loadAll, loadData} from "./core/dataloader";
 import Excel from 'exceljs'
-import {Stream} from "stream";
 
-const time = "2022-1-1T18";
 console.log()
 
 const app: Application = express()
@@ -28,12 +26,6 @@ app.post("/excel/:database/:view", async (request: Request, response: Response) 
     const sheet = workbook.addWorksheet(view)
     sheet.columns = header.map(h => ({
         key: h.fieldName, header: h.displayName, width: 50, style: {
-            border: {
-                top: {style: 'thin'},
-                left: {style: 'thin'},
-                bottom: {style: 'thin'},
-                right: {style: 'thin'}
-            }
         }
     }))
     sheet.addRows(rows)

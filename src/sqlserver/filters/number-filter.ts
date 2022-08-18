@@ -19,11 +19,11 @@ export class NumberFilter implements Filter {
         const items = new Array<string>()
 
         if (lessThan) {
-            items.push(`${this.column.fieldName} < ${lessThan}`);
+            items.push(`${this.column.fieldName} <= ${lessThan}`);
         }
 
         if (greaterThan) {
-            items.push(`${this.column.fieldName} > ${greaterThan}`);
+            items.push(`${this.column.fieldName} >= ${greaterThan}`);
         }
 
         if (equalTo) {

@@ -43,12 +43,11 @@ const openDb = (database: string) => {
         dialect: "mssql",
         dialectOptions: {
             server: "localhost"
-        }
+        },
     })
 }
 
-export class MssqlQueryService implements QueryService
-{
+export class MssqlQueryService implements QueryService {
     fetchAllRows(database: string, view: string, filerModel: FilterOnlyModel): Promise<Array<any>> {
         return fetchAllRows(database, view, filerModel)
     }
@@ -60,7 +59,6 @@ export class MssqlQueryService implements QueryService
     getViewInfo(database: string, view: string): Promise<Map<string, Column>> {
         return getViewInfo(database, view)
     }
-
 }
 
 export const getViewInfo = async (database: string, view: string): Promise<Map<string, Column>> => {
@@ -108,9 +106,9 @@ export const fetchRows = async (database: string, view: string, filterModel: Pag
     const rows = await db.query(`
 
     SELECT * 
-    FROM expose.${view}
+    FROM expose.[${view}]
     ${whereClause}
-    ORDER BY ${orderBy} ${ascending ? "asc" : "desc"}
+    ORDER BY [${orderBy}] ${ascending ? "asc" : "desc"}
     OFFSET ${skip} ROWS FETCH NEXT ${length} ROWS ONLY`, {
         type: QueryTypes.SELECT
     });

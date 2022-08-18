@@ -7,4 +7,6 @@ export enum DataType {
     DateTime,
     Boolean,
     Raw,
+    ShamsiTime,
+    ShamsiDate,
 }

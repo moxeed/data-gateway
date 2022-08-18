@@ -1,20 +1,21 @@
 import {Filter} from "../../core/interfaces/filter";
 import {Column} from "../../core/models/header";
-import {DateFilterData} from "../../core/models/filter-data";
-import moment from "moment";
+import {DateFilterData, jsonFormat} from "../../core/models/filter-data";
+import moment from "jalali-moment";
+
+const sqlFormat = "YYYY-MM-DD HH:mm:ss"
 
 export class DateFilter implements Filter {
     constructor(private column: Column, private data: DateFilterData) {
     }
 
-    toSqlDateTime(date: string): string{
-        return  moment(date, "YYYY-MM-DDTHH:mm:ss").format("YYYY-MM-DD HH:mm:ss")
+    toSqlDateTime(date: string): string {
+        return moment(date, jsonFormat).format(sqlFormat)
     }
 
-    isValidDateTime(date: string): boolean{
-        return moment(date, "YYYY-MM-DDTHH:mm:ss").isValid()
+    isValidDateTime(date: string): boolean {
+        return moment(date, jsonFormat).isValid()
     }
-
 
     isDataOk(): boolean {
         return (this.data.greaterThan !== undefined && this.isValidDateTime(this.data.greaterThan)) ||
@@ -26,11 +27,11 @@ export class DateFilter implements Filter {
         const items = new Array<string>()
 
         if (lessThan) {
-            items.push(`${this.column.fieldName} < '${this.toSqlDateTime(lessThan)}'`);
+            items.push(`[${this.column.fieldName}] <= '${this.toSqlDateTime(lessThan)}'`);
         }
 
         if (greaterThan) {
-            items.push(`${this.column.fieldName} > '${this.toSqlDateTime(greaterThan)}'`);
+            items.push(`[${this.column.fieldName}] >= '${this.toSqlDateTime(greaterThan)}'`);
         }
 
         return items;

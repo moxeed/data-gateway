@@ -48,20 +48,24 @@ const openDb = (database: string) => {
 }
 
 export class MssqlQueryService implements QueryService {
+
+    constructor(private schema: string) {
+    }
+    
     fetchAllRows(database: string, view: string, filerModel: FilterOnlyModel): Promise<Array<any>> {
-        return fetchAllRows(database, view, filerModel)
+        return fetchAllRows(database, this.schema, view, filerModel)
     }
 
     fetchRows(database: string, view: string, filerModel: PaginatedFilterModel): Promise<FetchResult> {
-        return fetchRows(database, view, filerModel)
+        return fetchRows(database, this.schema,view, filerModel)
     }
 
     getViewInfo(database: string, view: string): Promise<Map<string, Column>> {
-        return getViewInfo(database, view)
+        return getViewInfo(database, this.schema, view)
     }
 }
 
-export const getViewInfo = async (database: string, view: string): Promise<Map<string, Column>> => {
+export const getViewInfo = async (database: string, schema: string, view: string): Promise<Map<string, Column>> => {
 
     const db = openDb(database)
     const specification = new Map<string, Column>()
@@ -77,7 +81,7 @@ export const getViewInfo = async (database: string, view: string): Promise<Map<s
 		LEFT JOIN sys.extended_properties sep on v.object_id = sep.major_id
                                          AND c.column_id = sep.minor_id
                                          AND sep.name = 'DisplayName'
-    where v.name = '${view}' AND s.name = 'expose'`, {
+    where v.name = '${view}' AND s.name = '${schema}'`, {
         type: QueryTypes.SELECT
     })
 
@@ -97,7 +101,7 @@ export const getViewInfo = async (database: string, view: string): Promise<Map<s
     return specification
 }
 
-export const fetchRows = async (database: string, view: string, filterModel: PaginatedFilterModel): Promise<FetchResult> => {
+export const fetchRows = async (database: string, schema: string, view: string, filterModel: PaginatedFilterModel): Promise<FetchResult> => {
     const {page, length, orderBy, ascending, where} = filterModel
     const skip = (page - 1) * length
     const whereClause = where ? `WHERE ${where}` : ""
@@ -106,7 +110,7 @@ export const fetchRows = async (database: string, view: string, filterModel: Pag
     const rows = await db.query(`
 
     SELECT * 
-    FROM expose.[${view}]
+    FROM ${schema}.[${view}]
     ${whereClause}
     ORDER BY [${orderBy}] ${ascending ? "asc" : "desc"}
     OFFSET ${skip} ROWS FETCH NEXT ${length} ROWS ONLY`, {
@@ -115,7 +119,7 @@ export const fetchRows = async (database: string, view: string, filterModel: Pag
 
     const totalCount = await db.query<{ count: number }>(`
     SELECT COUNT(*) AS count
-    FROM expose.${view}
+    FROM ${schema}.${view}
     ${whereClause}`, {
         type: QueryTypes.SELECT
     });
@@ -124,7 +128,7 @@ export const fetchRows = async (database: string, view: string, filterModel: Pag
     return {rows, totalCount: totalCount[0].count}
 }
 
-export const fetchAllRows = async (database: string, view: string, filterModel: FilterOnlyModel): Promise<Array<any>> => {
+export const fetchAllRows = async (database: string, schema: string, view: string, filterModel: FilterOnlyModel): Promise<Array<any>> => {
     const {where} = filterModel
     const whereClause = where ? `WHERE ${where}` : ""
 
@@ -132,7 +136,7 @@ export const fetchAllRows = async (database: string, view: string, filterModel: 
     const rows = await db.query(`
 
     SELECT * 
-    FROM expose.${view}
+    FROM ${schema}.${view}
     ${whereClause}`, {
         type: QueryTypes.SELECT
     });

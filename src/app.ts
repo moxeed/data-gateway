@@ -13,15 +13,23 @@ app.post("/:database/:view", async (request: Request, response: Response) => {
     const {database, view} = request.params
     const filters = request.body
 
-    const dataTable = await loadData(new MssqlQueryService(), database, view, filters)
+    const dataTable = await loadData(new MssqlQueryService("public"), database, view, filters)
     response.status(200).json(dataTable)
 })
 
-app.post("/excel/:database/:view", async (request: Request, response: Response) => {
+app.post("/private/:database/:view", async (request: Request, response: Response) => {
     const {database, view} = request.params
     const filters = request.body
 
-    const {header, rows} = await loadAll(new MssqlQueryService(), database, view, filters)
+    const dataTable = await loadData(new MssqlQueryService("private"), database, view, filters)
+    response.status(200).json(dataTable)
+})
+
+app.post("/private/excel/:database/:view", async (request: Request, response: Response) => {
+    const {database, view} = request.params
+    const filters = request.body
+
+    const {header, rows} = await loadAll(new MssqlQueryService("private"), database, view, filters)
     const workbook = new Excel.Workbook()
     const sheet = workbook.addWorksheet(view)
     sheet.columns = header.map(h => ({
